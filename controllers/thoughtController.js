@@ -1,9 +1,10 @@
-const { Thought, User } = require('../models');
+const { thought } = require('../models/thought');
+const { user } = require('../models/user');
 
 const thoughtController = {
   // get all thoughts
   getAllThoughts(req, res) {
-    Thought.find({})
+    thought.find({})
       .sort({ createdAt: -1 })
       .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => {
@@ -14,7 +15,7 @@ const thoughtController = {
 
   // get a single thought by its _id
   getThoughtById(req, res) {
-    Thought.findOne({ _id: req.params.thoughtId })
+    thought.findOne({ _id: req.params.thoughtId })
       .then((dbThoughtData) => {
         // if no thought is found, send 404
         if (!dbThoughtData) {
@@ -31,9 +32,9 @@ const thoughtController = {
 
   // create a new thought and push the thought's _id to the associated user's thoughts array field
   createThought(req, res) {
-    Thought.create(req.body)
+    thought.create(req.body)
       .then((dbThoughtData) => {
-        return User.findOneAndUpdate(
+        return user.findOneAndUpdate(
           { _id: req.body.userId },
           { $push: { thoughts: dbThoughtData._id } },
           { new: true }
@@ -45,7 +46,7 @@ const thoughtController = {
           res.status(404).json({ message: 'No user found with this id!' });
           return;
         }
-        res.json({ message: 'Thought created successfully!' });
+        res.json({ message: 'thought created successfully!' });
       })
       .catch((err) => {
         console.log(err);
@@ -55,7 +56,7 @@ const thoughtController = {
 
   // update a thought by its _id
   updateThought(req, res) {
-    Thought.findOneAndUpdate({ _id: req.params.thoughtId }, req.body, {
+    thought.findOneAndUpdate({ _id: req.params.thoughtId }, req.body, {
       new: true,
       runValidators: true,
     })
@@ -65,7 +66,7 @@ const thoughtController = {
           res.status(404).json({ message: 'No thought found with this id!' });
           return;
         }
-        res.json({ message: 'Thought updated successfully!' });
+        res.json({ message: 'thought updated successfully!' });
       })
       .catch((err) => {
         console.log(err);
@@ -75,7 +76,7 @@ const thoughtController = {
 
   // remove a thought by its _id
   removeThought(req, res) {
-    Thought.findOneAndDelete({ _id: req.params.thoughtId })
+    thought.findOneAndDelete({ _id: req.params.thoughtId })
       .then((dbThoughtData) => {
         // if no thought is found, send 404
         if (!dbThoughtData) {
@@ -83,14 +84,14 @@ const thoughtController = {
           return;
         }
         // remove the thought _id from the associated user's thoughts array field
-        return User.findOneAndUpdate(
+        return user.findOneAndUpdate(
           { thoughts: req.params.thoughtId },
           { $pull: { thoughts: req.params.thoughtId } },
           { new: true }
         );
       })
       .then((dbUserData) => {
-        res.json({ message: 'Thought deleted successfully!' });
+        res.json({ message: 'thought deleted successfully!' });
       })
       .catch((err) => {
         console.log(err);
@@ -99,8 +100,8 @@ const thoughtController = {
   },
 
     // add a reaction to a thought
-    addReaction(req, res) {
-        Thought.findOneAndUpdate(
+    createReaction(req, res) {
+        thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
             { $push: { reactions: req.body } },
             { new: true, runValidators: true }
@@ -122,8 +123,8 @@ const thoughtController = {
     },
 
     // remove a reaction from a thought
-    removeReaction(req, res) {
-        Thought.findOneAndUpdate(
+    deleteReaction(req, res) {
+        thought.findOneAndUpdate(
             { _id: req.params.thoughtId },
             { $pull: { reactions: { reactionId: req.params.reactionId } } },
             { new: true }
@@ -151,33 +152,31 @@ module.exports = thoughtController;
 
 // Path: controllers\userController.js
 // Compare this snippet from controllers\userController.js:
-// const User = require('../models/User');
+// const user = require('../models/user');
 // to this snippet from controllers\thoughtController.js:
-// const { Thought, User } = require('../models');
+// const { thought, user } = require('../models');
 
 
-const { User, Thought } = require('../models');
+// const userController = {
+//     // get all users
+//     getAllUsers(req, res) {
+//         user.find({})
+//             .populate({
+//                 path: 'thoughts',
+//                 select: '-__v'
+//             })
+//             .populate({
+//                 path: 'friends',
+//                 select: '-__v'
+//             })
+//             .select('-__v')
+//             .sort({ _id: -1 })
+//             .then((dbUserData) => res.json(dbUserData))
+//             .catch((err) => {
+//                 console.log(err);
+//                 res.status(400).json(err);
+//             });
+//     }
+// };
 
-const userController = {
-    // get all users
-    getAllUsers(req, res) {
-        User.find({})
-            .populate({
-                path: 'thoughts',
-                select: '-__v'
-            })
-            .populate({
-                path: 'friends',
-                select: '-__v'
-            })
-            .select('-__v')
-            .sort({ _id: -1 })
-            .then((dbUserData) => res.json(dbUserData))
-            .catch((err) => {
-                console.log(err);
-                res.status(400).json(err);
-            });
-    }
-};
-
-module.exports = userController;
+// module.exports = userController;

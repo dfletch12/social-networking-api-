@@ -1,30 +1,42 @@
 // Import express router and controllers
-const router = require('express').Router();
+const mongoose = require("mongoose");
+const router = require("express").Router();
+
+// mongoose.connect(
+//   process.env.MONGODB_URI || "mongodb://localhost:27017/social-network",
+//   {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//   }
+// );
+
+// module.exports = mongoose.connection;
 const {
   getAllUsers,
-  getUserById,
+  getSingleUser,
   createUser,
-  updateUserById,
-  deleteUserById,
+  updateUser,
+  deleteUser,
   addFriend,
   removeFriend,
-} = require('../controllers/user-controller');
+} = require('../../controllers/userController');
+
 const {
   getAllThoughts,
   getThoughtById,
   createThought,
-  updateThoughtById,
-  deleteThoughtById,
+  updateThought,
+  removeThought,
   createReaction,
   deleteReaction,
-} = require('../controllers/thought-controller');
+} = require('../../controllers/thoughtController');
 
 // User routes
 router.get('/users', getAllUsers);
-router.get('/users/:id', getUserById);
+router.get('/users/:id', getSingleUser);
 router.post('/users', createUser);
-router.put('/users/:id', updateUserById);
-router.delete('/users/:id', deleteUserById);
+router.put('/users/:id', updateUser);
+router.delete('/users/:id', deleteUser);
 router.post('/users/:userId/friends/:friendId', addFriend);
 router.delete('/users/:userId/friends/:friendId', removeFriend);
 
@@ -32,8 +44,8 @@ router.delete('/users/:userId/friends/:friendId', removeFriend);
 router.get('/thoughts', getAllThoughts);
 router.get('/thoughts/:id', getThoughtById);
 router.post('/thoughts', createThought);
-router.put('/thoughts/:id', updateThoughtById);
-router.delete('/thoughts/:id', deleteThoughtById);
+router.put('/thoughts/:id', updateThought);
+router.delete('/thoughts/:id', removeThought);
 router.post('/thoughts/:thoughtId/reactions', createReaction);
 router.delete('/thoughts/:thoughtId/reactions/:reactionId', deleteReaction);
 
